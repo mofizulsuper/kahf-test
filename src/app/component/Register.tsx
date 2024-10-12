@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import dbConnect from '../../lib/mongodb'; // Import your dbConnect function
-import User from '../../models/user'; // Ensure you import the User model
+import dbConnect from '../../lib/mongodb';
+import User from '../../models/user';
 
 const RegisterContainer = styled.div`
   display: flex;
@@ -61,25 +61,36 @@ const Register = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // Prevent default form submission
-    await dbConnect(); // Ensure the database is connected
+		e.preventDefault();
 
-    // Create a new user with the plain password
-    const newUser = new User({
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      email: formData.email,
-      password: formData.password // Use the plain password
-    });
+		try {
+			// Send the form data to the API route
+			const response = await fetch('/api/register', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					firstName: formData.firstName,
+					lastName: formData.lastName,
+					email: formData.email,
+					password: formData.password,
+				}),
+			});
 
-    try {
-      await newUser.save(); // Save user to the database
-      alert('Registration successful!');
-      // Optionally, redirect or clear the form here
-    } catch (error) {
-      console.error('Error registering user:', error);
-      alert('Registration failed. Please try again.');
-    }
+			const data = await response.json();
+
+			if (response.ok) {
+				alert('Registration successful!');
+                // redirect to /signin page
+                window.location.href = '/signin';
+			} else {
+				alert(`Registration failed: ${data.message}`);
+			}
+		} catch (error) {
+			console.error('Error submitting form:', error);
+			alert('An error occurred. Please try again.');
+		}
   };
 
   return (
