@@ -62,8 +62,11 @@ const SignIn = () => {
 			});
 
 			if (response.ok) {
+				const userData = await response.json(); // Get user data from response
+				// Store user data in session storage
+				sessionStorage.setItem('user', JSON.stringify(userData.user)); // Save the user object
 				alert('Sign in successful!');
-				// Redirect to the dashboard or home page
+				// Redirect to the profile page
 				window.location.href = '/profile';
 			} else {
 				const errorData = await response.json();

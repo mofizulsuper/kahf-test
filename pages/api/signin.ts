@@ -16,13 +16,21 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 				return res.status(401).json({ message: 'Invalid credentials' });
 			}
 
-			// Check if the password matches (as plain text)
+			// Check if the password matches (you might want to use hashing here)
 			if (user.password !== password) {
 				return res.status(401).json({ message: 'Invalid credentials' });
 			}
 
-			// Successful login (you can set a session or JWT here if needed)
-			return res.status(200).json({ message: 'Sign in successful' });
+			// Successful login - include user details in the response
+			return res.status(200).json({
+				message: 'Sign in successful',
+				user: {
+					firstName: user.firstName,
+					lastName: user.lastName,
+					email: user.email,
+					profilePic: user.profilePic || '', // Add this if you have a profile picture field
+				},
+			});
 		} catch (error) {
 			console.error('Error during sign in:', error);
 			return res.status(500).json({ message: 'Internal server error' });
